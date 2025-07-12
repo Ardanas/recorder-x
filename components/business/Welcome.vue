@@ -4,13 +4,13 @@
       <img src="/wxt.svg" class="logo" alt="WXT logo" />
     </a>
     <div class="text-2xl font-bold">RecorderX</div>
-    <Button @click="isRecording = true" class="cursor-pointer w-80"> 开始录制 </Button>
+    <Button @click="emits('start')" class="cursor-pointer w-80"> 开始录制 </Button>
   </div>
 </template>
 
 <script setup lang="ts">
 import { Button } from '~/components/ui/button';
-const isRecording = defineModel();
+const emits = defineEmits(['start'])
 </script>
 
 
