@@ -1,21 +1,25 @@
-<script lang="ts" setup>
-import { ref, watch } from 'vue';
+<script lang="ts" setup>import { ref, watch, toRaw } from 'vue';
 import { Panel } from '~/components/business/panel';
 import Welcome from '~/components/business/Welcome.vue';
 import { messaging } from '~/messaging';
 import { storage } from '#imports';
-import { RecordItem } from '~/utils/types';
+import { RecordItem, Record, RecordMap } from '~/utils/types';
+import { createRecord, createRecordItem } from '~/utils/record';
+import { getCurrentTime } from '~/utils/time';const isRecording = ref(false);
+const currentRecord = ref<Record>(createRecord('录制记录'));
 
-const isRecording = ref(false);
-const recordList = ref<RecordItem[]>([]);
+function updateRecordTitle(newTitle: string) {
+  if (currentRecord.value) {
+    currentRecord.value.title = newTitle;
+    currentRecord.value.updatedAt = getCurrentTime();
+  }
+}
 
 storage.getItem<boolean>('local:isRecording').then((res) => {
   isRecording.value = !!res;
 });
 
-storage.getItem<RecordItem[]>('local:recordList').then((res) => {
-  recordList.value = res || [];
-});
+// 初始化空的记录
 
 watch(isRecording, async (newValue) => {
   if (newValue) {
@@ -79,13 +83,11 @@ async function addRedCircleToImage(
 }
 
 messaging.onMessage('capture', async ({ data }) => {
+  const url = await addRedCircleToImage(data.screenshot, data.clientX, data.clientY, data.devicePixelRatio);
   const info: RecordItem = {
-    title: data.text,
-    url: await addRedCircleToImage(data.screenshot, data.clientX, data.clientY, data.devicePixelRatio),
-    date: new Date().toLocaleTimeString(),
+    ...createRecordItem(data.text, url)
   };
-  recordList.value.push(info);
-  storage.setItem('local:recordList', recordList.value);
+  currentRecord.value.items.push(info);
 });
 
 function start() {
@@ -98,16 +100,15 @@ function stop() {
 
 function complete() {
   isRecording.value = false;
-  const list = toRaw(recordList.value);
-  recordList.value = [];
-  const key = Date.now();
-  storage.setItem('local:recordList', []);
+  currentRecord.value.updatedAt = getCurrentTime();
+  const record = toRaw(currentRecord.value);
+  currentRecord.value = createRecord('录制记录');
 
-  storage.getItem<Record<string, RecordItem[]>>('local:dataMap').then((res) => {
-    storage.setItem('local:dataMap', {
-      ...res,
-      [key]: list,
-    });
+  storage.getItem<RecordMap>('local:dataMap').then((res) => {
+    const dataMap = res || {};
+    const key = record.id;
+    dataMap[key] = record
+    storage.setItem('local:dataMap', dataMap);
     const url = browser.runtime.getURL(`/panel-edit.html?mapKey=${key}`);
     window.open(url); // Open the page in a new tab
   });
@@ -117,6 +118,12 @@ function complete() {
 <template>
   <div class="w-screen h-screen">
     <Welcome @start="start" v-if="!isRecording" />
-    <Panel :record-list="recordList" @stop="stop" @complete="complete" v-else />
+    <Panel
+      :record="currentRecord"
+      @stop="stop"
+      @complete="complete"
+      @updateTitle="updateRecordTitle"
+      v-else
+    />
   </div>
 </template>

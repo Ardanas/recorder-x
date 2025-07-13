@@ -1,58 +1,52 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
 import { Card, CardContent } from '~/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '~/components/ui/avatar';
+import { Record } from '~/utils/types';
+import { PanelTitleEdit, PanelImage } from '~/components/business/panel';
+import CardFooter from '@/components/ui/card/CardFooter.vue';
+import { Separator } from '@/components/ui/separator';
+import { formatTime } from '~/utils/time';
 
 const props = defineProps<{
-  list: { key: string; time: string }[];
-  currentKey?: string | null;
+  list: Record[];
 }>();
-const emits = defineEmits(['select']);
 
-const activeKey = computed(() => props.currentKey);
+const emits = defineEmits<{
+  (e: 'select', key: string): void;
+  (e: 'updateTitle', key: string, value: string): void;
+}>();
 
-const historyMeta = ref(props.list.map(item => ({ ...item, title: '', url: '' })));
+function handleTitleUpdate(record: Record, value: string) {
+  emits('updateTitle', record.id, value);
+}
 
-onMounted(async () => {
-  const res = await storage.getItem<Record<string, any>>('local:dataMap');
-  if (!res) return;
-  historyMeta.value = props.list.map(item => {
-    const arr = res[item.key] || [];
-    return {
-      ...item,
-      title: arr[0]?.title || '',
-      url: arr[0]?.url || '',
-    };
-  });
-});
 </script>
 
 <template>
-  <div class="flex gap-2 overflow-x-auto">
-    <Card
-      v-for="item in historyMeta"
-      :key="item.key"
-      :class="[
-        'min-w-[180px] flex-shrink-0 flex flex-col items-center justify-between transition-shadow',
-        activeKey === item.key ? 'ring-2 ring-primary border-primary' : 'border-border',
-        'hover:shadow-md',
-      ]"
-    >
-      <CardContent class="flex flex-col items-center p-3">
-        <Avatar class="mb-2 w-10 h-10">
-          <AvatarImage v-if="item.url" :src="item.url" />
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 p-4">
+    <Card v-for="record in props.list" :key="record.id" class="hover:shadow-md">
+      <CardContent class="p-3">
+        <div class="mb-2">
+          <PanelTitleEdit :title="record.title" @update="(value) => handleTitleUpdate(record, value)" />
+        </div>
+        <Avatar 
+          class="w-full h-50 bg-slate-100 rounded-md cursor-pointer" 
+          @click="emits('select', record.id)"
+        >
+          <PanelImage 
+            v-if="record.items.length && record.items[0].url" 
+            :src="record.items[0].url" 
+          />
           <AvatarFallback v-else>无图</AvatarFallback>
         </Avatar>
-        <div class="font-medium text-sm text-center line-clamp-1 w-32">{{ item.title || '无标题' }}</div>
-        <div class="text-xs text-muted-foreground mt-1">{{ item.time }}</div>
-        <button
-          class="mt-2 px-3 py-1 rounded bg-accent text-accent-foreground text-xs font-semibold border border-accent hover:bg-primary hover:text-primary-foreground transition-colors"
-          :class="activeKey === item.key ? 'bg-primary text-primary-foreground' : ''"
-          @click="() => emits('select', item.key)"
-        >
-          查看
-        </button>
       </CardContent>
+      <CardFooter>
+        <div class="flex h-5 items-center space-x-4 text-sm">
+          <div>{{ record.items.length }} 条</div>
+          <Separator orientation="vertical" />
+          <div>{{ formatTime(record.createdAt) }}</div>
+        </div>
+      </CardFooter>
     </Card>
   </div>
 </template>

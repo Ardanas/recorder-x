@@ -1,5 +1,5 @@
 <template>
-    <div class="flex w-full flex-row items-center gap-2" v-bind="$attrs">
+    <div class="flex flex-row items-center gap-2" v-bind="$attrs">
         <PanelOrderNumber v-if="props.order">{{ props.order }}</PanelOrderNumber>
         <p class="public-sans md:text-base/6 text-sm/5">
             {{ props.title }}
