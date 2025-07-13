@@ -1,6 +1,6 @@
 
 <template>
-  <div>
+  <div v-if="props.recordList.length">
     <Card v-for="(item, index) in props.recordList" :key="index">
       <CardHeader class="p-4">
         <CardTitle class="flex justify-between">
@@ -14,6 +14,8 @@
     </Card>
     <PanelPlus />
   </div>
+  <div v-else class="text-center text-lg py-8">暂无数据</div>
+
 </template>
 
 

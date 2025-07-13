@@ -5,6 +5,8 @@ import PanelImage from './PanelImage.vue'
 import PanelPlus from './PanelPlus.vue'
 import PanelEdit from './PanelEdit.vue'
 import PanelOperation from './PanelOperation.vue'
+import PanelHeader from './PanelHeader.vue'
+import PanelList from './PanelList.vue'
 
 export {
     Panel,
@@ -13,5 +15,7 @@ export {
     PanelImage,
     PanelPlus,
     PanelEdit,
-    PanelOperation
+    PanelOperation,
+    PanelHeader,
+    PanelList
 }
