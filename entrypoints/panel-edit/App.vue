@@ -7,31 +7,40 @@ import { getCurrentTime } from '~/utils/time';
 const currentRecord = ref<Record>();
 const showHistory = ref(false);
 const historyList = ref<Record[]>([]);
-const mapKey = new URLSearchParams(window.location.search).get('mapKey');
+const params = new URLSearchParams(window.location.search);
+const mapKey = params.get('mapKey');
+const isOpenMyRecord = params.get('my');
 
-onMounted(() => {
-  if (!mapKey) return
-  storage.getItem<RecordMap>('local:dataMap').then((res) => {
-    if (!res) return;
-    currentRecord.value = res[mapKey];
-  });
-});
-
-function handleSelectHistory(key: string) {
-  storage.getItem<RecordMap>('local:dataMap').then((res) => {
-    if (!res) return;
-    currentRecord.value = res[key];
-    showHistory.value = false;
-  });
+async function getMyHistoryList() {
+  const res = await storage.getItem<RecordMap>('local:dataMap');
+  if (!res) return [];
+  return Object.values(res)
 }
 
-function handleDownload() {
+onMounted(() => {
+  init();
+});
+
+function init() {
+  if (mapKey) {
+    storage.getItem<RecordMap>('local:dataMap').then((res) => {
+      if (!res) return;
+      currentRecord.value = res[mapKey];
+    });
+  } else if (isOpenMyRecord) {
+    handleShowHistory()
+  }
+}
+
+function handleSelectHistory(record: Record) {
+  currentRecord.value = record;
+  showHistory.value = false;
+}
+
+function handleDownload(type: string) {
   if (!currentRecord.value) return;
-  const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(currentRecord.value));
-  const dlAnchor = document.createElement('a');
-  dlAnchor.setAttribute('href', dataStr);
-  dlAnchor.setAttribute('download', `recordx-${currentRecord.value.id}.json`);
-  dlAnchor.click();
+  const url = browser.runtime.getURL(`/exports.html?mapKey=${mapKey}&type=${type}`);
+  window.open(url);
 }
 
 function handleDelete() {
@@ -44,15 +53,14 @@ function handleDelete() {
   });
 }
 
-async function handleShowHistory(list: { key: string; time: string }[]) {
-  const res = await storage.getItem<RecordMap>('local:dataMap');
-  if (!res) return;
-
-  historyList.value = list.map(item => res[item.key]).filter((record): record is Record => !!record);
+async function handleShowHistory() {
+  historyList.value = await getMyHistoryList();
   showHistory.value = true;
 }
 
-function handleUpdateTitle(recordId: string, title: string) {
+function handleUpdateTitle(title: string) {
+  const recordId = currentRecord.value?.id
+  if (!recordId) return
   storage.getItem<RecordMap>('local:dataMap').then((res) => {
     if (!res) return;
     const record = res[recordId];
@@ -73,24 +81,21 @@ function handleUpdateTitle(recordId: string, title: string) {
   <div class="w-screen h-screen flex flex-col bg-gray-50">
     <PanelHeader
       class="sticky top-0 z-10 border-b bg-background/80 backdrop-blur"
-      :current-key="currentRecord?.id"
       @download="handleDownload"
       @delete="handleDelete"
       @show-history="handleShowHistory"
     />
     <div class="flex-1 overflow-auto">
-      <div class="max-w-screen-xl mx-auto">
+      <div class="max-w-screen-md mx-auto">
         <PanelList
           v-if="showHistory"
           :list="historyList"
-          :current-key="currentRecord?.id"
           @select="handleSelectHistory"
-          @updateTitle="handleUpdateTitle"
         />
         <PanelEdit
           v-else
           :record="currentRecord"
-          @updateTitle="(title) => handleUpdateTitle(currentRecord!.id, title)"
+          @updateTitle="handleUpdateTitle"
         />
       </div>
     </div>
