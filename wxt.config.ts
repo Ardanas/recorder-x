@@ -5,7 +5,13 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineConfig({
   modules: ['@wxt-dev/module-vue'],
   manifest: {
-    permissions: ['storage']
+    permissions: ['storage'],
+    web_accessible_resources: [
+      {
+        resources: ["template.docx"],
+        matches: ["<all_urls>"]
+      }
+    ]
   },
   vite: () => ({
     plugins: [tailwindcss()]

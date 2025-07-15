@@ -12,13 +12,8 @@ const props = defineProps<{
 }>();
 
 const emits = defineEmits<{
-  (e: 'select', key: string): void;
-  (e: 'updateTitle', key: string, value: string): void;
+  (e: 'select', record: Record): void;
 }>();
-
-function handleTitleUpdate(record: Record, value: string) {
-  emits('updateTitle', record.id, value);
-}
 
 </script>
 
@@ -27,15 +22,15 @@ function handleTitleUpdate(record: Record, value: string) {
     <Card v-for="record in props.list" :key="record.id" class="hover:shadow-md">
       <CardContent class="p-3">
         <div class="mb-2">
-          <PanelTitleEdit :title="record.title" @update="(value) => handleTitleUpdate(record, value)" />
+          <PanelTitleEdit :title="record.title" />
         </div>
-        <Avatar 
-          class="w-full h-50 bg-slate-100 rounded-md cursor-pointer" 
-          @click="emits('select', record.id)"
+        <Avatar
+          class="w-full h-50 bg-slate-100 rounded-md cursor-pointer"
+          @click="emits('select', record)"
         >
-          <PanelImage 
-            v-if="record.items.length && record.items[0].url" 
-            :src="record.items[0].url" 
+          <PanelImage
+            v-if="record.items.length && record.items[0].url"
+            :src="record.items[0].url"
           />
           <AvatarFallback v-else>无图</AvatarFallback>
         </Avatar>

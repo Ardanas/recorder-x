@@ -98,11 +98,16 @@ function stop() {
   isRecording.value = false;
 }
 
+function openMyRecord() {
+  const url = browser.runtime.getURL(`/panel-edit.html?my=true`);
+  window.open(url); // Open the page in a new tab
+}
+
 function complete() {
   isRecording.value = false;
   currentRecord.value.updatedAt = getCurrentTime();
   const record = toRaw(currentRecord.value);
-  currentRecord.value = createRecord('录制记录');
+  currentRecord.value = createRecord(currentRecord.value.title);
 
   storage.getItem<RecordMap>('local:dataMap').then((res) => {
     const dataMap = res || {};
@@ -117,7 +122,7 @@ function complete() {
 
 <template>
   <div class="w-screen h-screen">
-    <Welcome @start="start" v-if="!isRecording" />
+    <Welcome @start="start" @my="openMyRecord" v-if="!isRecording" />
     <Panel
       :record="currentRecord"
       @stop="stop"
