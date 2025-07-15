@@ -8,13 +8,11 @@ const currentRecord = ref<Record>();
 const showHistory = ref(false);
 const historyList = ref<Record[]>([]);
 const params = new URLSearchParams(window.location.search);
-const mapKey = params.get('mapKey');
-const isOpenMyRecord = params.get('my');
 
 async function getMyHistoryList() {
   const res = await storage.getItem<RecordMap>('local:dataMap');
   if (!res) return [];
-  return Object.values(res)
+  return Object.values(res);
 }
 
 onMounted(() => {
@@ -22,13 +20,14 @@ onMounted(() => {
 });
 
 function init() {
+  const mapKey = params.get('mapKey');
   if (mapKey) {
     storage.getItem<RecordMap>('local:dataMap').then((res) => {
       if (!res) return;
       currentRecord.value = res[mapKey];
     });
-  } else if (isOpenMyRecord) {
-    handleShowHistory()
+  } else if (params.get('my')) {
+    handleShowHistory();
   }
 }
 
@@ -39,7 +38,7 @@ function handleSelectHistory(record: Record) {
 
 function handleDownload(type: string) {
   if (!currentRecord.value) return;
-  const url = browser.runtime.getURL(`/exports.html?mapKey=${mapKey}&type=${type}`);
+  const url = browser.runtime.getURL(`/exports.html?mapKey=${currentRecord.value.id}&type=${type}`);
   window.open(url);
 }
 
@@ -59,8 +58,8 @@ async function handleShowHistory() {
 }
 
 function handleUpdateTitle(title: string) {
-  const recordId = currentRecord.value?.id
-  if (!recordId) return
+  const recordId = currentRecord.value?.id;
+  if (!recordId) return;
   storage.getItem<RecordMap>('local:dataMap').then((res) => {
     if (!res) return;
     const record = res[recordId];
@@ -87,16 +86,8 @@ function handleUpdateTitle(title: string) {
     />
     <div class="flex-1 overflow-auto">
       <div class="max-w-screen-md mx-auto">
-        <PanelList
-          v-if="showHistory"
-          :list="historyList"
-          @select="handleSelectHistory"
-        />
-        <PanelEdit
-          v-else
-          :record="currentRecord"
-          @updateTitle="handleUpdateTitle"
-        />
+        <PanelList v-if="showHistory" :list="historyList" @select="handleSelectHistory" />
+        <PanelEdit v-else :record="currentRecord" @updateTitle="handleUpdateTitle" />
       </div>
     </div>
   </div>
