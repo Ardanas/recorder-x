@@ -58,7 +58,7 @@ function handleBlur() {
           </CardTitle>
         </CardHeader>
         <CardContent class="px-4 pb-4">
-          <PanelImage :src="item.url" alt="" srcset="" />
+          <PanelImage :src="item.url" :position="item.position" :size="item.size" alt="" srcset="" />
         </CardContent>
       </Card>
     </main>

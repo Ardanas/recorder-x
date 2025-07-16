@@ -35,6 +35,8 @@ export default defineContentScript({
         text,
         clientX: event.clientX,
         clientY: event.clientY,
+        imageWidth: document.documentElement.clientWidth,
+        imageHeight: document.documentElement.clientHeight,
         devicePixelRatio: window.devicePixelRatio,
       });
     }

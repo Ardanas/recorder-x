@@ -1,22 +1,46 @@
+<script setup lang="ts">
+import { Record } from '~/utils/types';
+import { PanelImage, PanelOperation, PanelTitleEdit, PanelOrderNumber } from './index'
+import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
+import { formatTime } from '~/utils/time';
+import { Button } from '~/components/ui/button';
+import { ArrowLeft } from 'lucide-vue-next';
+const props = defineProps<{
+  record?: Record;
+}>();
+
+const emits = defineEmits<{
+  (e: 'updateTitle', value: string): void;
+  (e: 'back'): void;
+}>();
+
+function handleTitleUpdate(value: string) {
+  emits('updateTitle', value);
+}
+</script>
 
 <template>
-  <div class="px-4" v-if="props.record">
-    <div class="p-4 flex items-center justify-between rounded-lg text-lg">
-      <PanelTitleEdit :title="props.record.title" @update="handleTitleUpdate" />
-      <div class="text-sm text-muted-foreground">
-        创建于 {{ formatTime(props.record.createdAt) }}
-      </div>
+  <div class="px-4 max-w-4xl mx-auto" v-if="props.record">
+    <div class="py-4 flex items-center justify-between rounded-lg">
+      <Button variant="ghost" class="cursor-pointer" @click="emits('back')">
+        <ArrowLeft />
+      </Button>
+      <PanelTitleEdit class="text-lg font-medium" :title="props.record.title" @update="handleTitleUpdate" />
+      <span class="text-sm text-muted-foreground">
+        {{ formatTime(props.record.updatedAt) }}
+      </span>
     </div>
     <template v-if="props.record.items.length">
       <Card v-for="(item, index) in props.record.items" :key="item.id" class="mb-4">
         <CardHeader class="p-4">
-          <CardTitle class="flex justify-between">
-            <div class="flex-1">{{ item.title }}</div>
+          <CardTitle class="flex items-center gap-2">
+            <PanelOrderNumber>{{index + 1}}</PanelOrderNumber>
+            <PanelTitleEdit class="flex-1 text-base font-medium" :title="item.title" @update="handleTitleUpdate" />
             <PanelOperation />
           </CardTitle>
         </CardHeader>
-        <CardContent class="px-4 pb-4 h-70">
-          <PanelImage :src="item.url" alt="" srcset="" />
+        <CardContent class="px-4 pb-4">
+          <PanelImage :src="item.url" :position="item.position" :size="item.size" alt="" srcset="" />
         </CardContent>
       </Card>
     </template>
@@ -26,21 +50,4 @@
 </template>
 
 
-<script setup lang="ts">
-import { Record } from '~/utils/types';
-import { PanelImage, PanelOperation, PanelTitleEdit } from './index'
-import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
-import { formatTime } from '~/utils/time';
 
-const props = defineProps<{
-  record?: Record;
-}>();
-
-const emits = defineEmits<{
-  (e: 'updateTitle', value: string): void;
-}>();
-
-function handleTitleUpdate(value: string) {
-  emits('updateTitle', value);
-}
-</script>

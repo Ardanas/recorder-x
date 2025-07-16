@@ -82,11 +82,15 @@ async function addRedCircleToImage(
   });
 }
 
-messaging.onMessage('capture', async ({ data }) => {
-  const url = await addRedCircleToImage(data.screenshot, data.clientX, data.clientY, data.devicePixelRatio);
-  const info: RecordItem = {
-    ...createRecordItem(data.text, url)
-  };
+messaging.onMessage('captureDone', async ({ data }) => {
+  console.log('data==',data)
+  // const url = await addRedCircleToImage(data.screenshot, data.clientX, data.clientY, data.devicePixelRatio);
+  const info: RecordItem = createRecordItem(
+    data.text,
+    data.screenshot,
+    { x: data.clientX, y: data.clientY },
+    { width: data.imageWidth, height: data.imageHeight }
+  );
   currentRecord.value.items.push(info);
 });
 

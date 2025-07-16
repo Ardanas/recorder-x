@@ -7,6 +7,7 @@ import { getCurrentTime } from '~/utils/time';
 const currentRecord = ref<Record>();
 const showHistory = ref(false);
 const historyList = ref<Record[]>([]);
+const isShowExport = computed(() => !showHistory.value)
 const params = new URLSearchParams(window.location.search);
 
 async function getMyHistoryList() {
@@ -55,6 +56,7 @@ function handleDelete() {
 async function handleShowHistory() {
   historyList.value = await getMyHistoryList();
   showHistory.value = true;
+  currentRecord.value = undefined;
 }
 
 function handleUpdateTitle(title: string) {
@@ -80,15 +82,14 @@ function handleUpdateTitle(title: string) {
   <div class="w-screen h-screen flex flex-col bg-gray-50">
     <PanelHeader
       class="sticky top-0 z-10 border-b bg-background/80 backdrop-blur"
+      :show-export="isShowExport"
       @download="handleDownload"
       @delete="handleDelete"
       @show-history="handleShowHistory"
     />
-    <div class="flex-1 overflow-auto">
-      <div class="max-w-screen-md mx-auto">
-        <PanelList v-if="showHistory" :list="historyList" @select="handleSelectHistory" />
-        <PanelEdit v-else :record="currentRecord" @updateTitle="handleUpdateTitle" />
-      </div>
+    <div class="flex-1 overflow-auto container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <PanelList v-if="showHistory" :list="historyList" @select="handleSelectHistory" />
+      <PanelEdit v-else :record="currentRecord" @updateTitle="handleUpdateTitle" />
     </div>
   </div>
 </template>

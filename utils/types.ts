@@ -1,7 +1,19 @@
+export interface Position {
+  x: number;
+  y: number;
+}
+
+export interface Size {
+  width: number;
+  height: number;
+}
+
 export interface RecordItem {
   id: string,
   title: string;
   url: string;
+  position: Position;
+  size: Size;
   createdAt: string,
   updatedAt: string,
 }

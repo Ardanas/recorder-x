@@ -1,4 +1,4 @@
-import type { Record, RecordItem } from './types';
+import type { Record, RecordItem, Position, Size } from './types';
 import { getCurrentTime } from './time';
 
 function generateId(): string {
@@ -18,7 +18,7 @@ export function createRecord(title: string): Record {
   };
 }
 
-export function createRecordItem(title: string, url: string): RecordItem {
+export function createRecordItem(title: string, url: string, position: Position, size: Size): RecordItem {
   const id = generateId();
   const time = getCurrentTime();
 
@@ -28,5 +28,7 @@ export function createRecordItem(title: string, url: string): RecordItem {
     url,
     createdAt: time,
     updatedAt: time,
+    position,
+    size,
   };
 }

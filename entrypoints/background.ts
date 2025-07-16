@@ -6,7 +6,7 @@ export default defineBackground(() => {
   messaging.onMessage('capture', async ({ data }) => {
     const base64 = await browser.tabs.captureVisibleTab();
     const message = { ...(data || {}), screenshot: base64 };
-    return messaging.sendMessage('capture', message);
+    return messaging.sendMessage('captureDone', message);
   });
 
   messaging.onMessage('start', async () => {

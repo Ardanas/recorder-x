@@ -3,6 +3,12 @@ import { Button } from '~/components/ui/button';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuItem } from '~/components/ui/dropdown-menu';
 
 const emits = defineEmits(['download', 'delete', 'show-history']);
+const props = defineProps({
+  showExport: {
+    type: Boolean,
+    default: false,
+  }
+});
 </script>
 
 <template>
@@ -13,7 +19,7 @@ const emits = defineEmits(['download', 'delete', 'show-history']);
       <span class="font-bold text-xl tracking-wide">RecordX</span>
     </div>
     <div class="flex items-center gap-2">
-      <DropdownMenu>
+      <DropdownMenu v-if="props.showExport">
         <DropdownMenuTrigger>
           <Button>导出</Button>
         </DropdownMenuTrigger>
