@@ -28,7 +28,7 @@ export async function useRecordCreate(currentRecord: Ref<Record | null | undefin
 
     record.title = currentRecord.value.title = title;
     record.updatedAt = currentRecord.value.updatedAt = getCurrentTime();
-    await storage.setItem<Record>('local:dataMap', record);
+    await storage.setItem<Record>('local:currentRecord', record);
   }
 
   /**
@@ -52,8 +52,17 @@ export async function useRecordCreate(currentRecord: Ref<Record | null | undefin
     currentRecord.value = record;
   }
 
+  async function deleteItem(item: RecordItem) {
+    const record = await storage.getItem<Record>('local:currentRecord');
+    if (!record) return;
+    record.items = record.items.filter((i) => i.id === item.id);
+    await storage.setItem<Record>('local:currentRecord', record);
+    currentRecord.value = record;
+  }
+
   return {
     updateTitle,
     updateItemTitle,
+    deleteItem
   };
 }

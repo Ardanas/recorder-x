@@ -12,7 +12,7 @@ import { useRecordState } from '~/composables/useRecordState';
 const currentRecord = ref<Record | null>();
 
 const { recordState, initState, startRecording, stopRecording, resumeRecording, completeRecording } = useRecordState();
-const { updateTitle, updateItemTitle } = await useRecordCreate(currentRecord);
+const { updateTitle, updateItemTitle, deleteItem } = await useRecordCreate(currentRecord);
 const { saveCurrentRecord, saveRecord } = useRecordStorage();
 
 provide('recordState', recordState);
@@ -82,6 +82,7 @@ messaging.onMessage('captureDone', async ({ data }) => {
           @stop="stopRecording"
           @resume="resumeRecording"
           @complete="complete"
+          @deleteItem="deleteItem"
           @updateTitle="updateTitle"
           @updateItemTitle="updateItemTitle"
         />

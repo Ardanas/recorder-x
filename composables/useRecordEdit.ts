@@ -52,8 +52,24 @@ export function useRecordEdit(currentRecord: Ref<Record | null | undefined>) {
     currentRecord.value = record;
   }
 
+  async function deleteItem(item: RecordItem) {
+    if (!currentRecord.value) return;
+
+    const res = await storage.getItem<RecordMap>('local:dataMap');
+    if (!res) return;
+
+    const mapKey = currentRecord.value.id;
+    const record = res[mapKey];
+    if (!record) return;
+
+    record.items = record.items.filter((i) => i.id === item.id);
+    await storage.setItem('local:dataMap', res);
+    currentRecord.value = record;
+  }
+
   return {
     updateTitle,
     updateItemTitle,
+    deleteItem,
   };
 }

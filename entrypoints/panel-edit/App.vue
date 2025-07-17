@@ -16,7 +16,7 @@ const isShowExport = computed(() => !showHistory.value);
 const params = new URLSearchParams(window.location.search);
 
 const recordStorage = useRecordStorage();
-const { updateTitle, updateItemTitle } = useRecordEdit(currentRecord);
+const { updateTitle, updateItemTitle, deleteItem } = useRecordEdit(currentRecord);
 
 onMounted(() => {
   init();
@@ -81,6 +81,7 @@ async function handleShowHistory() {
       <PanelEdit
         v-else
         :record="currentRecord"
+        @deleteItem="deleteItem"
         @updateTitle="updateTitle"
         @updateItemTitle="updateItemTitle"
         @back="handleShowHistory"

@@ -12,7 +12,7 @@ const props = defineProps<{
 
 const recordState = inject<RECORD_STATE>('recordState', RECORD_STATE.START);
 
-const emits = defineEmits(['complete', 'stop', 'resume', 'updateTitle', 'updateItemTitle']);
+const emits = defineEmits(['complete', 'stop', 'resume', 'updateTitle', 'updateItemTitle', 'deleteItem']);
 
 function handleTitleUpdate(value: string) {
   emits('updateTitle', value);
@@ -55,7 +55,7 @@ watch(
               :title="item.title"
               @update="(value) => handleItemTitleUpdate(value, item)"
             />
-            <PanelOperation />
+            <PanelOperation @delete="emits('deleteItem', item)"/>
           </CardTitle>
         </CardHeader>
         <CardContent class="p-2 pt-0 flex-1">

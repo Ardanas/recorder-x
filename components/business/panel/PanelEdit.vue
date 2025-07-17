@@ -13,6 +13,7 @@ const emits = defineEmits<{
   (e: 'updateTitle', value: string): void;
   (e: 'updateItemTitle', value: string, item: RecordItem): void;
   (e: 'back'): void;
+  (e: 'deleteItem', item: RecordItem): void;
 }>();
 
 function handleTitleUpdate(value: string) {
@@ -41,7 +42,7 @@ function handleItemTitleUpdate(value: string, item: RecordItem) {
           <CardTitle class="flex items-center gap-2">
             <PanelOrderNumber>{{index + 1}}</PanelOrderNumber>
             <PanelTitleEdit class="flex-1 text-base font-medium" :title="item.title" @update="(value) => handleItemTitleUpdate(value, item)" />
-            <PanelOperation />
+            <PanelOperation @delete="emits('deleteItem', item)"/>
           </CardTitle>
         </CardHeader>
         <CardContent class="px-4 pb-4">
