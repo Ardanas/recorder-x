@@ -16,7 +16,7 @@ const props = defineProps({
     <div class="flex items-center gap-2">
       <!-- <Logo class="w-8 h-8" /> -->
       <!-- LOGO -->
-      <span class="font-bold text-xl tracking-wide">RecordX</span>
+      <span class="font-bold text-xl tracking-wide">RecorderX</span>
     </div>
     <div class="flex items-center gap-2">
       <DropdownMenu v-if="props.showExport">

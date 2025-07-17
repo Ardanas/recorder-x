@@ -11,7 +11,7 @@ export default defineConfig({
         resources: ["template.docx"],
         matches: ["<all_urls>"]
       }
-    ]
+    ],
   },
   vite: () => ({
     plugins: [tailwindcss()]
