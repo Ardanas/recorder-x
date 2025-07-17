@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
 import { PanelHeader, PanelList, PanelEdit } from '~/components/business/panel';
-import { Record, RecordMap } from '~/utils/types';
+import { Record, RecordItem, RecordMap } from '~/utils/types';
 import { getCurrentTime } from '~/utils/time';
 
 const currentRecord = ref<Record>();
@@ -32,9 +32,15 @@ function init() {
   }
 }
 
+function replaceState() {
+  window.history.replaceState({}, '', `${window.location.pathname}?${params.toString()}`);
+}
+
 function handleSelectHistory(record: Record) {
   currentRecord.value = record;
   showHistory.value = false;
+  params.set('mapKey', record.id);
+  replaceState();
 }
 
 function handleDownload(type: string) {
@@ -57,6 +63,9 @@ async function handleShowHistory() {
   historyList.value = await getMyHistoryList();
   showHistory.value = true;
   currentRecord.value = undefined;
+  params.set('my', 'true');
+  params.delete('mapKey');
+  replaceState();
 }
 
 function handleUpdateTitle(title: string) {
@@ -76,6 +85,33 @@ function handleUpdateTitle(title: string) {
     }
   });
 }
+
+function handleUpdateItemTitle (title: string, item: RecordItem) {
+  const recordId = currentRecord.value?.id;
+  if (!recordId) return;
+  storage.getItem<RecordMap>('local:dataMap').then((res) => {
+    if (!res) return;
+    const record = res[recordId];
+    if (!record) return;
+
+    // 查找并更新对应的 RecordItem
+    const targetItem = record.items.find(i => i.id === item.id);
+    if (targetItem) {
+      targetItem.title = title;
+      record.updatedAt = getCurrentTime();
+      storage.setItem('local:dataMap', res);
+
+      // 更新当前显示的记录
+      if (currentRecord.value?.id === recordId) {
+        currentRecord.value = record;
+      }
+    }
+  });
+}
+
+function handleBack() {
+  handleShowHistory()
+}
 </script>
 
 <template>
@@ -89,7 +125,12 @@ function handleUpdateTitle(title: string) {
     />
     <div class="flex-1 overflow-auto container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <PanelList v-if="showHistory" :list="historyList" @select="handleSelectHistory" />
-      <PanelEdit v-else :record="currentRecord" @updateTitle="handleUpdateTitle" />
+      <PanelEdit v-else
+        :record="currentRecord"
+        @updateTitle="handleUpdateTitle"
+        @updateItemTitle="handleUpdateItemTitle"
+        @back="handleBack"
+      />
     </div>
   </div>
 </template>

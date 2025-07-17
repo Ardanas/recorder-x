@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { Record } from '~/utils/types';
+import { Record, RecordItem } from '~/utils/types';
 import { PanelImage, PanelOperation, PanelTitleEdit, PanelOrderNumber } from './index'
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
-import { formatTime } from '~/utils/time';
+import { getRelativeTime } from '~/utils/time';
 import { Button } from '~/components/ui/button';
 import { ArrowLeft } from 'lucide-vue-next';
 const props = defineProps<{
@@ -11,11 +11,16 @@ const props = defineProps<{
 
 const emits = defineEmits<{
   (e: 'updateTitle', value: string): void;
+  (e: 'updateItemTitle', value: string, item: RecordItem): void;
   (e: 'back'): void;
 }>();
 
 function handleTitleUpdate(value: string) {
   emits('updateTitle', value);
+}
+
+function handleItemTitleUpdate(value: string, item: RecordItem) {
+  emits('updateItemTitle', value, item)
 }
 </script>
 
@@ -27,7 +32,7 @@ function handleTitleUpdate(value: string) {
       </Button>
       <PanelTitleEdit class="text-lg font-medium" :title="props.record.title" @update="handleTitleUpdate" />
       <span class="text-sm text-muted-foreground">
-        {{ formatTime(props.record.updatedAt) }}
+        {{ getRelativeTime(props.record.updatedAt) }}
       </span>
     </div>
     <template v-if="props.record.items.length">
@@ -35,7 +40,7 @@ function handleTitleUpdate(value: string) {
         <CardHeader class="p-4">
           <CardTitle class="flex items-center gap-2">
             <PanelOrderNumber>{{index + 1}}</PanelOrderNumber>
-            <PanelTitleEdit class="flex-1 text-base font-medium" :title="item.title" @update="handleTitleUpdate" />
+            <PanelTitleEdit class="flex-1 text-base font-medium" :title="item.title" @update="(value) => handleItemTitleUpdate(value, item)" />
             <PanelOperation />
           </CardTitle>
         </CardHeader>
