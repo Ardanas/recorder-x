@@ -2,6 +2,7 @@
 import { Record, RecordItem } from '~/utils/types';
 import { PanelImage, PanelOperation, PanelTitleEdit, PanelOrderNumber } from './index'
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
+import { Empty } from '~/components/ui/empty';
 import { getRelativeTime } from '~/utils/time';
 import { Button } from '~/components/ui/button';
 import { ArrowLeft } from 'lucide-vue-next';
@@ -50,9 +51,9 @@ function handleItemTitleUpdate(value: string, item: RecordItem) {
         </CardContent>
       </Card>
     </template>
-    <div v-else class="text-center text-lg py-8">暂无记录项</div>
+    <Empty description="暂无记录项" />
   </div>
-  <div v-else class="text-center text-lg py-8">暂无数据</div>
+  <Empty />
 </template>
 
 

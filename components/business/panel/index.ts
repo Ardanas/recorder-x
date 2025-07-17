@@ -19,5 +19,5 @@ export {
     PanelOperation,
     PanelHeader,
     PanelList,
-    PanelTitle
+    PanelTitle,
 }

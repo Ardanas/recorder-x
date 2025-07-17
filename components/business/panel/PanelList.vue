@@ -2,8 +2,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
 import { Record, RecordItem } from '~/utils/types';
 import { PanelImage } from '~/components/business/panel';
-import CardFooter from '@/components/ui/card/CardFooter.vue';
-import { Separator } from '@/components/ui/separator';
+import CardFooter from '~/components/ui/card/CardFooter.vue';
+import { Separator } from '~/components/ui/separator';
+import { Empty } from '~/components/ui/empty';
 import { getRelativeTime } from '~/utils/time';
 
 const props = defineProps<{
@@ -56,5 +57,5 @@ const recordList = computed(() => {
       </CardFooter>
     </Card>
   </div>
-  <div v-else>暂无数据</div>
+  <Empty description="暂无数据，立刻开始吧~"/>
 </template>
