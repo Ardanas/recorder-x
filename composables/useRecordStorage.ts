@@ -71,12 +71,17 @@ export function useRecordStorage() {
     return await storage.getItem<Record>('local:currentRecord');
   }
 
+  async function removeCurrentRecord() {
+    return await storage.removeItem('local:currentRecord');
+  }
+
   return {
     getHistoryList,
     getRecordById,
     saveRecord,
     deleteRecord,
     saveCurrentRecord,
-    getCurrentRecord
+    getCurrentRecord,
+    removeCurrentRecord
   };
 }

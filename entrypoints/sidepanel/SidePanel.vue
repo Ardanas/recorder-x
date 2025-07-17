@@ -11,9 +11,9 @@ import { useRecordState } from '~/composables/useRecordState';
 
 const currentRecord = ref<Record | null>();
 
-const { recordState, initState, startRecording, stopRecording, resumeRecording, completeRecording } = useRecordState();
+const { recordState, initState, startRecording, pausedRecording, stopRecording, resumeRecording, completeRecording } = useRecordState();
 const { updateTitle, updateItemTitle, deleteItem } = await useRecordCreate(currentRecord);
-const { saveCurrentRecord, saveRecord } = useRecordStorage();
+const { saveCurrentRecord, saveRecord, removeCurrentRecord } = useRecordStorage();
 
 provide('recordState', recordState);
 defineOptions({ name: 'SidePanel' });
@@ -35,21 +35,23 @@ function openPanelEdit(key: string) {
 }
 
 async function start() {
-  currentRecord.value = createRecord('录制记录');
+  currentRecord.value = createRecord('操作手册');
   await startRecording();
+}
+
+async function stop() {
+  await stopRecording()
+  await removeCurrentRecord();
+  currentRecord.value = null;
 }
 
 async function complete() {
   if (!currentRecord.value) return;
   await completeRecording();
-  await updateDataMap();
+  await saveRecord(toRaw(currentRecord.value));
+  await removeCurrentRecord();
   openPanelEdit(currentRecord.value.id);
   currentRecord.value = null;
-}
-
-async function updateDataMap() {
-  if (!currentRecord.value) return;
-  await saveRecord(toRaw(currentRecord.value));
 }
 
 watch(
@@ -79,7 +81,8 @@ messaging.onMessage('captureDone', async ({ data }) => {
         <Panel
           v-else-if="currentRecord"
           :record="currentRecord"
-          @stop="stopRecording"
+          @paused="pausedRecording"
+          @stop="stop"
           @resume="resumeRecording"
           @complete="complete"
           @deleteItem="deleteItem"

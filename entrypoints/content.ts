@@ -56,7 +56,7 @@ export default defineContentScript({
       recording = true;
     }
 
-    function stopRecording() {
+    function pausedRecording() {
       if (!recording) return;
       document.removeEventListener('click', sendOperation, true);
       recording = false;
@@ -67,10 +67,10 @@ export default defineContentScript({
       startRecording();
     });
 
-    messaging.onMessage('stop', () => {
-      console.log('stop===');
+    messaging.onMessage('paused', () => {
+      console.log('paused===');
 
-      stopRecording();
+      pausedRecording();
     });
   },
 });

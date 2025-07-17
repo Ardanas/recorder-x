@@ -32,6 +32,6 @@ export interface RecordMap {
 
 export enum RECORD_STATE {
   START = 'START',
-  STOP = 'STOP',
+  PAUSED = 'PAUSED',
   COMPLETE = 'COMPLETE',
 }

@@ -14,8 +14,8 @@ export default defineBackground(() => {
     return messaging.sendMessage('start', undefined, tabs[0].id);
   });
 
-  messaging.onMessage('stop', async () => {
+  messaging.onMessage('paused', async () => {
     const tabs = await browser.tabs.query({ active: true, currentWindow: true });
-    return messaging.sendMessage('stop', undefined, tabs[0].id);
+    return messaging.sendMessage('paused', undefined, tabs[0].id);
   });
 });

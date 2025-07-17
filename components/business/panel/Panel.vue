@@ -13,7 +13,7 @@ const props = defineProps<{
 
 const recordState = inject<RECORD_STATE>('recordState', RECORD_STATE.START);
 
-const emits = defineEmits(['complete', 'stop', 'resume', 'updateTitle', 'updateItemTitle', 'deleteItem']);
+const emits = defineEmits(['complete', 'stop', 'paused', 'resume', 'updateTitle', 'updateItemTitle', 'deleteItem']);
 
 function handleTitleUpdate(value: string) {
   emits('updateTitle', value);
@@ -68,15 +68,20 @@ watch(
       <Empty description="暂无数据，点击页面即可录制~" v-else />
     </main>
     <footer class="flex-shrink-0 border-t p-2">
-      <Button
+      <div class="flex justify-between">
+        <Button
         variant="outline"
         class="cursor-pointer"
-        @click="emits(recordState === RECORD_STATE.STOP ? 'resume' : 'stop')"
+        @click="emits(recordState === RECORD_STATE.PAUSED ? 'resume' : 'paused')"
       >
-        {{ recordState === RECORD_STATE.STOP ? '恢复录制' : '暂停录制' }}
+        {{ recordState === RECORD_STATE.PAUSED ? '恢复录制' : '暂停录制' }}
       </Button>
+      <Button variant="destructive" @click="emits('stop')">
+        结束录制
+      </Button>
+      </div>
       <div class="mt-2">
-        <Button class="w-full cursor-pointer" @click="emits('complete')">完成录制</Button>
+        <Button class="w-full cursor-pointer" :disabled="props.record.items.length === 0" @click="emits('complete')">完成录制</Button>
       </div>
     </footer>
   </div>

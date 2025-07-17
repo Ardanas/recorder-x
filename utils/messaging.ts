@@ -2,7 +2,7 @@ import { defineExtensionMessaging } from '@webext-core/messaging';
 
 interface ProtocolMap {
   start(): void;
-  stop(): void;
+  paused(): void;
   capture(s: any): void;
   captureDone(o: Record<string, any>): void
 }

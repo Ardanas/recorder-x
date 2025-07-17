@@ -28,10 +28,10 @@ export function useRecordState() {
   /**
    * 设置记录状态为暂停录制
    */
-  async function stopRecording() {
-    recordState.value = RECORD_STATE.STOP;
-    await storage.setItem('local:recordState', RECORD_STATE.STOP);
-    await messaging.sendMessage('stop', undefined);
+  async function pausedRecording() {
+    recordState.value = RECORD_STATE.PAUSED;
+    await storage.setItem('local:recordState', RECORD_STATE.PAUSED);
+    await messaging.sendMessage('paused', undefined);
   }
 
   /**
@@ -39,6 +39,14 @@ export function useRecordState() {
    */
   async function resumeRecording() {
     return startRecording();
+  }
+
+  /**
+   * 设置记录状态为结束
+   */
+  async function stopRecording() {
+    recordState.value = RECORD_STATE.COMPLETE;
+    await storage.setItem('local:recordState', RECORD_STATE.COMPLETE);
   }
 
   /**
@@ -53,6 +61,7 @@ export function useRecordState() {
     recordState,
     initState,
     startRecording,
+    pausedRecording,
     stopRecording,
     resumeRecording,
     completeRecording

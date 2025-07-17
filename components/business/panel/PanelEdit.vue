@@ -7,7 +7,7 @@ import { getRelativeTime } from '~/utils/time';
 import { Button } from '~/components/ui/button';
 import { ArrowLeft } from 'lucide-vue-next';
 const props = defineProps<{
-  record?: Record;
+  record: Record;
 }>();
 
 const emits = defineEmits<{
@@ -27,7 +27,7 @@ function handleItemTitleUpdate(value: string, item: RecordItem) {
 </script>
 
 <template>
-  <div class="px-4 max-w-4xl mx-auto" v-if="props.record">
+  <div class="px-4 max-w-4xl mx-auto">
     <div class="py-4 flex items-center justify-between rounded-lg">
       <Button variant="ghost" class="cursor-pointer" @click="emits('back')">
         <ArrowLeft />
@@ -53,7 +53,6 @@ function handleItemTitleUpdate(value: string, item: RecordItem) {
     </template>
     <Empty description="暂无记录项" />
   </div>
-  <Empty />
 </template>
 
 

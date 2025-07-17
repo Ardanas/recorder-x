@@ -79,7 +79,7 @@ async function handleShowHistory() {
     <div class="flex-1 overflow-auto container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <PanelList v-if="showHistory" :list="historyList" @select="handleSelectHistory" />
       <PanelEdit
-        v-else
+        v-else-if="currentRecord"
         :record="currentRecord"
         @deleteItem="deleteItem"
         @updateTitle="updateTitle"
