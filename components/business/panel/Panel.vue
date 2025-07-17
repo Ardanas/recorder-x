@@ -21,17 +21,31 @@ function handleTitleUpdate(value: string) {
 function handleItemTitleUpdate(value: string, item: RecordItem) {
   emits('updateItemTitle', value, item);
 }
+
+const mainRef = useTemplateRef('mainRef');
+watch(
+  () => props.record.items.length,
+  (newValue, oldValue) => {
+    if (oldValue && newValue > oldValue) {
+      setTimeout(() => {
+        mainRef.value?.scrollTo({
+          top: mainRef.value.scrollHeight,
+          behavior: 'smooth',
+        });
+      }, 0);
+    }
+  },
+  { immediate: true }
+);
 </script>
 
 <template>
   <div class="w-full h-full overflow-hidden flex flex-col gap-2">
-    <header class="p-4 border-b">
-      <div class="flex items-center justify-between">
-        <PanelTitleEdit class="flex-1 text-lg font-medium" :title="props.record.title" @update="handleTitleUpdate" />
-        <div class="text-sm text-gray-500">{{ getRelativeTime(props.record.updatedAt) }}</div>
-      </div>
+    <header class="p-4 border-b flex items-center justify-between">
+      <PanelTitleEdit class="flex-1 text-lg font-medium" :title="props.record.title" @update="handleTitleUpdate" />
+      <div class="text-sm text-gray-500">{{ getRelativeTime(props.record.updatedAt) }}</div>
     </header>
-    <main class="flex-1 p-2 overflow-auto">
+    <main class="flex-1 p-2 overflow-auto" ref="mainRef">
       <Card class="shadow-none border-none mb-4" v-for="(item, index) in props.record.items" :key="item.id">
         <CardHeader class="p-2">
           <CardTitle class="flex items-center gap-2">
