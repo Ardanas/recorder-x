@@ -30,5 +30,8 @@ export interface RecordMap {
   [key: string]: Record;
 }
 
-
-
+export enum RECORD_STATE {
+  START = 'START',
+  STOP = 'STOP',
+  COMPLETE = 'COMPLETE',
+}

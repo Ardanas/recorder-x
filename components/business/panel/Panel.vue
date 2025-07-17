@@ -1,16 +1,18 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, inject } from 'vue';
 import { Button } from '~/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
 import { PanelTitle, PanelImage } from '~/components/business/panel';
-import { Record } from '~/utils/types';
+import { Record, RECORD_STATE } from '~/utils/types';
 import { formatTime } from '~/utils/time';
 
 const props = defineProps<{
   record: Record
 }>();
 
-const emits = defineEmits(['complete', 'stop', 'updateTitle']);
+const recordState = inject<RECORD_STATE>('recordState', RECORD_STATE.START);
+
+const emits = defineEmits(['complete', 'stop', 'resume', 'updateTitle']);
 
 const isEditing = ref(false);
 const editingTitle = ref('');
@@ -54,7 +56,7 @@ function handleBlur() {
       <Card class="shadow-none" v-for="(item, index) in props.record.items" :key="item.id">
         <CardHeader class="p-4">
           <CardTitle>
-            <PanelTitle :order="index + 1" :title="item.title" />
+            <PanelTitle :title="item.title" />
           </CardTitle>
         </CardHeader>
         <CardContent class="px-4 pb-4">
@@ -63,7 +65,13 @@ function handleBlur() {
       </Card>
     </main>
     <footer class="flex-shrink-0 border-t p-2">
-      <Button variant="outline" class="cursor-pointer" @click="emits('stop')">暂停录制</Button>
+      <Button
+        variant="outline"
+        class="cursor-pointer"
+        @click="emits(recordState === RECORD_STATE.STOP ? 'resume' : 'stop')"
+      >
+        {{ recordState === RECORD_STATE.STOP ? '恢复录制' : '暂停录制' }}
+      </Button>
       <div class="mt-2">
         <Button class="w-full cursor-pointer" @click="emits('complete')">完成录制</Button>
       </div>

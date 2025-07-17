@@ -1,12 +1,21 @@
 import { messaging } from '@/messaging';
+import { RECORD_STATE } from '~/utils/types';
 
 export default defineContentScript({
   matches: ['<all_urls>'],
   runAt: 'document_end',
   allFrames: false,
   main(ctx) {
-
     let recording = false;
+
+    async function init() {
+      const res = await storage.getItem<RECORD_STATE>('local:recordState');
+      if (res === RECORD_STATE.START) {
+        startRecording();
+      }
+    }
+
+    init();
 
     function getClickTypeAndText(event: MouseEvent) {
       const el = event.target;
@@ -54,14 +63,14 @@ export default defineContentScript({
     }
 
     messaging.onMessage('start', () => {
-      console.log('start===')
+      console.log('start===');
       startRecording();
-    })
+    });
 
     messaging.onMessage('stop', () => {
-      console.log('stop===')
+      console.log('stop===');
 
       stopRecording();
-    })
+    });
   },
 });
