@@ -1,4 +1,4 @@
-import { messaging } from '@/messaging';
+import { messaging } from '~/utils';
 
 export default defineBackground(() => {
   console.log('Hello background!', { id: browser.runtime.id });

@@ -1,4 +1,4 @@
-import { messaging } from '@/messaging';
+import { messaging } from '~/utils';
 import { RECORD_STATE } from '~/utils/types';
 
 export default defineContentScript({

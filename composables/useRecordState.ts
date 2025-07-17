@@ -1,7 +1,5 @@
-import { ref, Ref } from 'vue';
-import { RECORD_STATE } from '~/utils/types';
-import { storage } from '#imports';
-import { messaging } from '~/messaging';
+import { ref } from 'vue';
+import { messaging, RECORD_STATE } from '~/utils';
 
 /**
  * 提供记录状态管理的功能

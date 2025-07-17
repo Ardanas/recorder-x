@@ -2,7 +2,7 @@
 import { ref, watch, toRaw, computed, provide } from 'vue';
 import { Panel } from '~/components/business/panel';
 import Welcome from '~/components/business/Welcome.vue';
-import { messaging } from '~/messaging';
+import { messaging } from '~/utils';
 import { RecordItem, Record, RECORD_STATE } from '~/utils/types';
 import { createRecord, createRecordItem } from '~/utils/record';
 import { useRecordCreate } from '~/composables/useRecordCreate';
