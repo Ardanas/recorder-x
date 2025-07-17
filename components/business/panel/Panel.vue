@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, inject } from 'vue';
 import { Button } from '~/components/ui/button';
+import { Empty } from '~/components/ui/empty';
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
 import { PanelImage, PanelOperation, PanelTitleEdit, PanelOrderNumber } from './index';
 import { Record, RECORD_STATE } from '~/utils/types';
@@ -46,22 +47,25 @@ watch(
       <div class="text-sm text-gray-500">{{ getRelativeTime(props.record.updatedAt) }}</div>
     </header>
     <main class="flex-1 p-2 overflow-auto" ref="mainRef">
-      <Card class="shadow-none border-none mb-4" v-for="(item, index) in props.record.items" :key="item.id">
-        <CardHeader class="p-2">
-          <CardTitle class="flex items-center gap-2">
-            <PanelOrderNumber>{{ index + 1 }}</PanelOrderNumber>
-            <PanelTitleEdit
-              class="flex-1 text-base font-medium"
-              :title="item.title"
-              @update="(value) => handleItemTitleUpdate(value, item)"
-            />
-            <PanelOperation @delete="emits('deleteItem', item)"/>
-          </CardTitle>
-        </CardHeader>
-        <CardContent class="p-2 pt-0 flex-1">
-          <PanelImage :src="item.url" :position="item.position" :size="item.size" alt="" srcset="" />
-        </CardContent>
-      </Card>
+      <template v-if="props.record.items.length">
+        <Card class="shadow-none border-none mb-4" v-for="(item, index) in props.record.items" :key="item.id">
+          <CardHeader class="p-2">
+            <CardTitle class="flex items-center gap-2">
+              <PanelOrderNumber>{{ index + 1 }}</PanelOrderNumber>
+              <PanelTitleEdit
+                class="flex-1 text-base font-medium"
+                :title="item.title"
+                @update="(value) => handleItemTitleUpdate(value, item)"
+              />
+              <PanelOperation @delete="emits('deleteItem', item)" />
+            </CardTitle>
+          </CardHeader>
+          <CardContent class="p-2 pt-0 flex-1">
+            <PanelImage :src="item.url" :position="item.position" :size="item.size" alt="" srcset="" />
+          </CardContent>
+        </Card>
+      </template>
+      <Empty description="暂无数据，点击页面即可录制~" v-else />
     </main>
     <footer class="flex-shrink-0 border-t p-2">
       <Button

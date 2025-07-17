@@ -7,7 +7,7 @@ const props = defineProps<{
 
 <template>
   <div
-    class="flex justify-center items-center text-base text-gray-500 py-8"
+    class="flex justify-center items-center text-sm text-gray-500 py-8"
     :class="props.class"
   >
     {{ props.description || '暂无数据' }}
