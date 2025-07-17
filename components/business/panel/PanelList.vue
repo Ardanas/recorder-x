@@ -33,7 +33,7 @@ const recordList = computed(() => {
 </script>
 
 <template>
-  <div class="grid grid-cols-1 xl:grid-cols-2 4xl:grid-cols-4 gap-4 py-6">
+  <div class="grid grid-cols-1 xl:grid-cols-2 4xl:grid-cols-4 gap-4 py-6" v-if="recordList.length">
     <Card v-for="record in recordList" :key="record.origin.id" class="hover:shadow-md flex flex-col cursor-pointer" @click="emits('select', record.origin)">
       <CardHeader class="p-3">
         <CardTitle class="text-lg font-medium">
@@ -56,4 +56,5 @@ const recordList = computed(() => {
       </CardFooter>
     </Card>
   </div>
+  <div v-else>暂无数据</div>
 </template>

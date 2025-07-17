@@ -20,15 +20,14 @@ onMounted(() => {
   init();
 });
 
-function init() {
+async function init() {
   const mapKey = params.get('mapKey');
   if (mapKey) {
-    storage.getItem<RecordMap>('local:dataMap').then((res) => {
-      if (!res) return;
-      currentRecord.value = res[mapKey];
-    });
+    const res = await storage.getItem<RecordMap>('local:dataMap')
+    if (!res) return
+    currentRecord.value = res[mapKey];
   } else if (params.get('my')) {
-    handleShowHistory();
+    await handleShowHistory();
   }
 }
 

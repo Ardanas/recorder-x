@@ -2,31 +2,24 @@
 import { ref, inject } from 'vue';
 import { Button } from '~/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
-import { PanelTitle, PanelImage } from '~/components/business/panel';
+import { PanelImage, PanelOperation, PanelTitleEdit, PanelOrderNumber } from './index';
 import { Record, RECORD_STATE } from '~/utils/types';
 import { formatTime } from '~/utils/time';
 
 const props = defineProps<{
-  record: Record
+  record: Record;
 }>();
 
 const recordState = inject<RECORD_STATE>('recordState', RECORD_STATE.START);
 
-const emits = defineEmits(['complete', 'stop', 'resume', 'updateTitle']);
+const emits = defineEmits(['complete', 'stop', 'resume', 'updateTitle', 'updateItemTitle']);
 
-const isEditing = ref(false);
-const editingTitle = ref('');
-
-function startEdit() {
-  editingTitle.value = props.record.title;
-  isEditing.value = true;
+function handleTitleUpdate(value: string) {
+  emits('updateTitle', value);
 }
 
-function handleBlur() {
-  if (editingTitle.value !== props.record.title) {
-    emits('updateTitle', editingTitle.value);
-  }
-  isEditing.value = false;
+function handleItemTitleUpdate(value: string, item: RecordItem) {
+  emits('updateItemTitle', value, item);
 }
 </script>
 
@@ -34,32 +27,24 @@ function handleBlur() {
   <div class="w-full h-full overflow-hidden flex flex-col gap-4">
     <header class="p-4 border-b">
       <div class="flex items-center justify-between">
-        <div class="flex-1">
-          <div v-if="!isEditing" @click="startEdit" class="text-xl font-bold cursor-pointer hover:text-primary">
-            {{ props.record.title }}
-          </div>
-          <input
-            v-else
-            v-model="editingTitle"
-            @blur="handleBlur"
-            type="text"
-            class="w-full text-xl font-bold border-b focus:outline-none focus:border-primary"
-            ref="titleInput"
-          />
-        </div>
-        <div class="text-sm text-gray-500">
-          创建于 {{ formatTime(props.record.createdAt) }}
-        </div>
+        <PanelTitleEdit class="flex-1 text-lg font-medium" :title="props.record.title" @update="handleTitleUpdate" />
+        <div class="text-sm text-gray-500">创建于 {{ formatTime(props.record.createdAt) }}</div>
       </div>
     </header>
     <main class="flex-1 p-2 overflow-auto">
-      <Card class="shadow-none" v-for="(item, index) in props.record.items" :key="item.id">
-        <CardHeader class="p-4">
-          <CardTitle>
-            <PanelTitle :title="item.title" />
+      <Card class="shadow-none border-none mb-4" v-for="(item, index) in props.record.items" :key="item.id">
+        <CardHeader class="p-2">
+          <CardTitle class="flex items-center gap-2">
+            <PanelOrderNumber>{{ index + 1 }}</PanelOrderNumber>
+            <PanelTitleEdit
+              class="flex-1 text-base font-medium"
+              :title="item.title"
+              @update="(value) => handleItemTitleUpdate(value, item)"
+            />
+            <PanelOperation />
           </CardTitle>
         </CardHeader>
-        <CardContent class="px-4 pb-4">
+        <CardContent class="p-2 pt-0 flex-1">
           <PanelImage :src="item.url" :position="item.position" :size="item.size" alt="" srcset="" />
         </CardContent>
       </Card>
