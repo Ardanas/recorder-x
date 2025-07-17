@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
 import { PanelImage, PanelOperation, PanelTitleEdit, PanelOrderNumber } from './index';
 import { Record, RECORD_STATE } from '~/utils/types';
 import { getRelativeTime } from '~/utils/time';
+import { CirclePause, CircleStop, CircleCheck, StepForward } from 'lucide-vue-next';
 
 const props = defineProps<{
   record: Record;
@@ -70,18 +71,24 @@ watch(
     <footer class="flex-shrink-0 border-t p-2">
       <div class="flex justify-between">
         <Button
-        variant="outline"
-        class="cursor-pointer"
-        @click="emits(recordState === RECORD_STATE.PAUSED ? 'resume' : 'paused')"
-      >
-        {{ recordState === RECORD_STATE.PAUSED ? '恢复录制' : '暂停录制' }}
-      </Button>
-      <Button variant="destructive" @click="emits('stop')">
-        结束录制
-      </Button>
+          variant="outline"
+          class="cursor-pointer"
+          @click="emits(recordState === RECORD_STATE.PAUSED ? 'resume' : 'paused')"
+        >
+          <CirclePause v-if="recordState === RECORD_STATE.PAUSED" />
+          <StepForward v-else />
+          {{ recordState === RECORD_STATE.PAUSED ? '恢复录制' : '暂停录制' }}
+        </Button>
+        <Button variant="destructive" @click="emits('stop')">
+          <CircleStop class="size-4" />
+          结束录制
+        </Button>
       </div>
       <div class="mt-2">
-        <Button class="w-full cursor-pointer" :disabled="props.record.items.length === 0" @click="emits('complete')">完成录制</Button>
+        <Button class="w-full cursor-pointer" :disabled="props.record.items.length === 0" @click="emits('complete')">
+          <CircleCheck class="size-4" />
+          完成录制
+        </Button>
       </div>
     </footer>
   </div>
