@@ -4,7 +4,7 @@ import { Button } from '~/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
 import { PanelImage, PanelOperation, PanelTitleEdit, PanelOrderNumber } from './index';
 import { Record, RECORD_STATE } from '~/utils/types';
-import { formatTime } from '~/utils/time';
+import { getRelativeTime } from '~/utils/time';
 
 const props = defineProps<{
   record: Record;
@@ -24,11 +24,11 @@ function handleItemTitleUpdate(value: string, item: RecordItem) {
 </script>
 
 <template>
-  <div class="w-full h-full overflow-hidden flex flex-col gap-4">
+  <div class="w-full h-full overflow-hidden flex flex-col gap-2">
     <header class="p-4 border-b">
       <div class="flex items-center justify-between">
         <PanelTitleEdit class="flex-1 text-lg font-medium" :title="props.record.title" @update="handleTitleUpdate" />
-        <div class="text-sm text-gray-500">创建于 {{ formatTime(props.record.createdAt) }}</div>
+        <div class="text-sm text-gray-500">{{ getRelativeTime(props.record.updatedAt) }}</div>
       </div>
     </header>
     <main class="flex-1 p-2 overflow-auto">

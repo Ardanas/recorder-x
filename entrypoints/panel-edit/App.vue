@@ -1,20 +1,22 @@
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { PanelHeader, PanelList, PanelEdit } from '~/components/business/panel';
-import { Record, RecordItem, RecordMap } from '~/utils/types';
-import { getCurrentTime } from '~/utils/time';
+import { Record } from '~/utils/types';
+import { useRecordEdit } from '~/composables/useRecordEdit';
+import { useRecordStorage } from '~/composables/useRecordStorage';
+
+defineOptions({
+  name: 'PanelEdit'
+})
 
 const currentRecord = ref<Record>();
 const showHistory = ref(false);
 const historyList = ref<Record[]>([]);
-const isShowExport = computed(() => !showHistory.value)
+const isShowExport = computed(() => !showHistory.value);
 const params = new URLSearchParams(window.location.search);
 
-async function getMyHistoryList() {
-  const res = await storage.getItem<RecordMap>('local:dataMap');
-  if (!res) return [];
-  return Object.values(res);
-}
+const recordStorage = useRecordStorage();
+const { updateTitle, updateItemTitle } = useRecordEdit(currentRecord);
 
 onMounted(() => {
   init();
@@ -23,11 +25,12 @@ onMounted(() => {
 async function init() {
   const mapKey = params.get('mapKey');
   if (mapKey) {
-    const res = await storage.getItem<RecordMap>('local:dataMap')
-    if (!res) return
-    currentRecord.value = res[mapKey];
+    currentRecord.value = await recordStorage.getRecordById(mapKey);
   } else if (params.get('my')) {
     await handleShowHistory();
+  } else {
+    alert('参数错误');
+    window.close();
   }
 }
 
@@ -48,68 +51,19 @@ function handleDownload(type: string) {
   window.open(url);
 }
 
-function handleDelete() {
+async function handleDelete() {
   if (!currentRecord.value) return;
-  storage.getItem<RecordMap>('local:dataMap').then((res) => {
-    if (!res) return;
-    delete res[currentRecord.value!.id];
-    storage.setItem('local:dataMap', res);
-    currentRecord.value = undefined;
-  });
+  await recordStorage.deleteRecord(currentRecord.value.id);
+  currentRecord.value = undefined;
 }
 
 async function handleShowHistory() {
-  historyList.value = await getMyHistoryList();
+  historyList.value = await recordStorage.getHistoryList();
   showHistory.value = true;
   currentRecord.value = undefined;
   params.set('my', 'true');
   params.delete('mapKey');
   replaceState();
-}
-
-function handleUpdateTitle(title: string) {
-  const recordId = currentRecord.value?.id;
-  if (!recordId) return;
-  storage.getItem<RecordMap>('local:dataMap').then((res) => {
-    if (!res) return;
-    const record = res[recordId];
-    if (!record) return;
-
-    record.title = title;
-    record.updatedAt = getCurrentTime();
-    storage.setItem('local:dataMap', res);
-
-    if (currentRecord.value?.id === recordId) {
-      currentRecord.value = record;
-    }
-  });
-}
-
-function handleUpdateItemTitle (title: string, item: RecordItem) {
-  const recordId = currentRecord.value?.id;
-  if (!recordId) return;
-  storage.getItem<RecordMap>('local:dataMap').then((res) => {
-    if (!res) return;
-    const record = res[recordId];
-    if (!record) return;
-
-    // 查找并更新对应的 RecordItem
-    const targetItem = record.items.find(i => i.id === item.id);
-    if (targetItem) {
-      targetItem.title = title;
-      record.updatedAt = getCurrentTime();
-      storage.setItem('local:dataMap', res);
-
-      // 更新当前显示的记录
-      if (currentRecord.value?.id === recordId) {
-        currentRecord.value = record;
-      }
-    }
-  });
-}
-
-function handleBack() {
-  handleShowHistory()
 }
 </script>
 
@@ -124,11 +78,12 @@ function handleBack() {
     />
     <div class="flex-1 overflow-auto container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <PanelList v-if="showHistory" :list="historyList" @select="handleSelectHistory" />
-      <PanelEdit v-else
+      <PanelEdit
+        v-else
         :record="currentRecord"
-        @updateTitle="handleUpdateTitle"
-        @updateItemTitle="handleUpdateItemTitle"
-        @back="handleBack"
+        @updateTitle="updateTitle"
+        @updateItemTitle="updateItemTitle"
+        @back="handleShowHistory"
       />
     </div>
   </div>
