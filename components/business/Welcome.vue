@@ -1,7 +1,7 @@
 <template>
   <div class="size-full flex flex-col gap-4 justify-center items-center relative">
     <a href="#" target="_blank">
-      <img src="/icon.png" class="logo" alt="WXT logo" />
+      <img src="/icon.png" class="logo h-[200px]" alt="WXT logo"/>
     </a>
     <div class="text-2xl font-bold">RecorderX</div>
     <Button @click="emits('start')" class="cursor-pointer w-80"> 开始录制 </Button>
